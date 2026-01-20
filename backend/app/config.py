@@ -63,7 +63,13 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
     
     # CORS
-    CORS_ORIGINS: List[str] = ["http://localhost:3000", "https://prontocasa.it"]
+    CORS_ORIGINS: List[str] = [
+        "http://localhost:3000",
+        "https://prontocasa.it",
+        "https://www.prontocasa.it",
+        "https://prontocasa.net",
+        "https://www.prontocasa.net"
+    ]
     
     # Media settings
     MEDIA_RETENTION_DAYS: int = 10  # Auto-delete after 10 days
