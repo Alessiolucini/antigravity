@@ -15,14 +15,14 @@ export function Logo({ className, variant = "default", size = "md" }: LogoProps)
     };
 
     return (
-        <Link href="/" className={cn("flex items-center transition-opacity hover:opacity-90", className)}>
+        <Link href="/" className={cn("flex items-center transition-opacity hover:opacity-90 leading-none", className)}>
             <img
                 src="/logo.png"
                 alt="Pronto Casa Logo"
                 className={cn(
-                    "w-auto object-contain",
+                    "w-auto h-full object-contain mix-blend-multiply",
                     heightClasses[size],
-                    variant === "white" && "brightness-0 invert" // Simple way to make it white if needed
+                    variant === "white" && "brightness-0 invert mix-blend-normal"
                 )}
             />
         </Link>
