@@ -31,7 +31,7 @@ export default function LoginPage() {
                 <div className="space-y-2">
                     <div className="flex justify-between items-center">
                         <Label htmlFor="password">Password</Label>
-                        <Link href="/auth/forgot-password" class="text-xs text-primary hover:underline">
+                        <Link href="/auth/forgot-password" className="text-xs text-primary hover:underline">
                             Recupera
                         </Link>
                     </div>
