@@ -9,9 +9,9 @@ interface LogoProps {
 
 export function Logo({ className, variant = "default", size = "md" }: LogoProps) {
     const heightClasses = {
-        sm: "h-8",
-        md: "h-12",
-        lg: "h-16"
+        sm: "h-10",
+        md: "h-16",
+        lg: "h-24"
     };
 
     return (
@@ -22,7 +22,7 @@ export function Logo({ className, variant = "default", size = "md" }: LogoProps)
                 className={cn(
                     "w-auto h-full object-contain mix-blend-multiply",
                     heightClasses[size],
-                    variant === "white" && "brightness-0 invert mix-blend-normal"
+                    variant === "white" && "brightness-0 invert mix-blend-screen" // mix-blend-screen works better for white on dark
                 )}
             />
         </Link>
