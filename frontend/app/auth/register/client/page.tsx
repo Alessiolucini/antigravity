@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 
+import { API_BASE_URL } from "@/lib/api-config";
+
 export default function ClientRegisterPage() {
     const [formData, setFormData] = useState({ name: "", email: "", password: "" });
     const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
@@ -17,17 +19,18 @@ export default function ClientRegisterPage() {
         setStatus(null);
 
         try {
-            const response = await fetch("https://api.prontocasa.net/api/v1/auth/register", {
+            const response = await fetch(`${API_BASE_URL}/auth/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
             });
 
-            const data = await response.json();
-
             if (!response.ok) {
+                const data = await response.json();
                 throw new Error(data.detail || "Errore durante la registrazione");
             }
+
+            const data = await response.json();
 
             setStatus({ type: "success", message: "Registrazione avvenuta con successo! Stai per essere reindirizzato." });
             // Redirect after success
@@ -35,7 +38,11 @@ export default function ClientRegisterPage() {
                 window.location.href = "/auth/login";
             }, 2000);
         } catch (error: any) {
-            setStatus({ type: "error", message: error.message });
+            console.error("Registration error:", error);
+            const errorMessage = error.message === "Failed to fetch"
+                ? "Impossibile collegarsi al server. Verifica la tua connessione o riprova più tardi."
+                : error.message;
+            setStatus({ type: "error", message: errorMessage });
         } finally {
             setIsLoading(false);
         }
