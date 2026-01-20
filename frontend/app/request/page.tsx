@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
     Droplet, Zap, Key, Thermometer, Hammer, Wrench,
     ArrowLeft, ArrowRight, Camera, Upload, AlertCircle,
-    CheckCircle2, Clock, ShieldCheck
+    CheckCircle2, Clock, ShieldCheck, X
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -31,7 +31,8 @@ function RequestPageBody() {
         description: "",
         urgency: "Normal",
         address: "",
-        contact: ""
+        contact: "",
+        files: [] as { file: File; preview: string }[]
     });
 
     useEffect(() => {
@@ -44,6 +45,30 @@ function RequestPageBody() {
 
     const nextStep = () => setStep(prev => prev + 1);
     const prevStep = () => setStep(prev => prev - 1);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFiles = e.target.files;
+        if (!selectedFiles) return;
+
+        const newFiles = Array.from(selectedFiles).map(file => ({
+            file,
+            preview: URL.createObjectURL(file)
+        }));
+
+        setFormData(prev => ({
+            ...prev,
+            files: [...prev.files, ...newFiles].slice(0, 6) // Limit to 6 photos
+        }));
+    };
+
+    const removeFile = (index: number) => {
+        setFormData(prev => {
+            const newFiles = [...prev.files];
+            URL.revokeObjectURL(newFiles[index].preview);
+            newFiles.splice(index, 1);
+            return { ...prev, files: newFiles };
+        });
+    };
 
     return (
         <main className="flex-grow pt-24 pb-12">
@@ -87,8 +112,8 @@ function RequestPageBody() {
                                             nextStep();
                                         }}
                                         className={`p-6 rounded-2xl border-2 text-left transition-all duration-200 group ${formData.category === service.id
-                                                ? "border-primary bg-orange-50"
-                                                : "border-white bg-white hover:border-orange-100"
+                                            ? "border-primary bg-orange-50"
+                                            : "border-white bg-white hover:border-orange-100"
                                             }`}
                                     >
                                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-colors ${formData.category === service.id ? "bg-primary text-white" : "bg-neutral-100 text-primary group-hover:bg-primary group-hover:text-white"
@@ -137,15 +162,56 @@ function RequestPageBody() {
                                 <div className="space-y-4">
                                     <Label className="text-lg">Carica foto o video</Label>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <button className="flex flex-col items-center justify-center gap-2 p-8 border-2 border-dashed border-neutral-200 rounded-2xl hover:border-primary hover:bg-orange-50 transition-all text-neutral-400 hover:text-primary group">
+                                        <input
+                                            type="file"
+                                            id="camera-input"
+                                            accept="image/*"
+                                            capture="environment"
+                                            className="hidden"
+                                            onChange={handleFileChange}
+                                            multiple
+                                        />
+                                        <input
+                                            type="file"
+                                            id="library-input"
+                                            accept="image/*,video/*"
+                                            className="hidden"
+                                            onChange={handleFileChange}
+                                            multiple
+                                        />
+
+                                        <button
+                                            onClick={() => document.getElementById("camera-input")?.click()}
+                                            className="flex flex-col items-center justify-center gap-2 p-8 border-2 border-dashed border-neutral-200 rounded-2xl hover:border-primary hover:bg-orange-50 transition-all text-neutral-400 hover:text-primary group"
+                                        >
                                             <Camera className="w-8 h-8" />
                                             <span className="text-xs font-bold uppercase tracking-wider">Scatta Foto</span>
                                         </button>
-                                        <button className="flex flex-col items-center justify-center gap-2 p-8 border-2 border-dashed border-neutral-200 rounded-2xl hover:border-primary hover:bg-orange-50 transition-all text-neutral-400 hover:text-primary group">
+                                        <button
+                                            onClick={() => document.getElementById("library-input")?.click()}
+                                            className="flex flex-col items-center justify-center gap-2 p-8 border-2 border-dashed border-neutral-200 rounded-2xl hover:border-primary hover:bg-orange-50 transition-all text-neutral-400 hover:text-primary group"
+                                        >
                                             <Upload className="w-8 h-8" />
                                             <span className="text-xs font-bold uppercase tracking-wider">Libreria</span>
                                         </button>
                                     </div>
+
+                                    {/* Previews */}
+                                    {formData.files.length > 0 && (
+                                        <div className="grid grid-cols-3 gap-2 pt-2">
+                                            {formData.files.map((file, idx) => (
+                                                <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-neutral-100 group">
+                                                    <img src={file.preview} alt="preview" className="w-full h-full object-cover" />
+                                                    <button
+                                                        onClick={() => removeFile(idx)}
+                                                        className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <Button
